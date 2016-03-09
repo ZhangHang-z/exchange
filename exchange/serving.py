@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-
-from maybeHot import handler as H
+from exchange import handler as H
 import socket
 
 try:
@@ -38,6 +37,7 @@ def make_app(HOST=None, PORT=None):
 	if PORT is None:
 		PORT = 8888
 
+	print "Serveing on Host: {0} \r\nPort: {1} \r\n".format(HOST, PORT)
 	def app():
 		print "app function ......"
 
