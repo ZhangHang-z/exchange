@@ -1,3 +1,5 @@
 
+.idea
+.setting
 *.pyc
 test/node_modules

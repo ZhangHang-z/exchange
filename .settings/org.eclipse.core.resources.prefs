@@ -1,0 +1,5 @@
+eclipse.preferences.version=1
+encoding//exchange/__init__.py=utf-8
+encoding//exchange/handler.py=utf-8
+encoding//exchange/serving.py=utf-8
+encoding//exchange/smts/__init__.py=utf-8

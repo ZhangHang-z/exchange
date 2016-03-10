@@ -9,15 +9,13 @@ except ImportError:
 
 
 class WSGIServer(TCPServer, object):
-
-	allow_reuse_allow = 1  # for test environment
+	# for test environment
+	allow_reuse_allow = 1  
 
 	def __init__(self, host, port, app, handler=None):
 		if handler is None:
 			handler = H.BaseRequestHandler
-
 		TCPServer.__init__(self, (host, port), handler)
-
 		self.appliation = app
 
 	def server_bind(self):
@@ -31,16 +29,16 @@ class WSGIServer(TCPServer, object):
 		return self.appliation
 
 
-def make_app(HOST=None, PORT=None):
-	if HOST is None:
-		HOST = "127.0.0.1"
-	if PORT is None:
-		PORT = 8888
+def make_app(host=None, port=None):
+	if host is None:
+		host = "127.0.0.1"
+	if port is None:
+		port = 8888
 
-	print "Serveing on Host: {0} \r\nPort: {1} \r\n".format(HOST, PORT)
+	print "Serveing on host: {0} \r\nport: {1} \r\n".format(host, port)
 	def app():
 		print "app function ......"
 
-	server = WSGIServer(HOST, PORT, app)
+	server = WSGIServer(host, port, app)
 	server.serve_forever()
 

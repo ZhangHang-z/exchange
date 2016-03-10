@@ -12,13 +12,15 @@ import socket
 import time
 import sys
 import smts
+import urlparse
 
 from warnings import filterwarnings, catch_warnings
+import path
 with catch_warnings():
-	if sys.py3kwarning:
-		filterwarnings("ignore", "*mimetools has been removed",
-						DeprecationWarning)
-	import mimetools
+    if sys.py3kwarning:
+        filterwarnings("ignore", "*mimetools has been removed",
+                    DeprecationWarning)
+        import mimetools
 
 try:
     # for py2.
@@ -47,6 +49,8 @@ class BaseRequestHandler(BaseHTTPRequestHandler, object):
 
     # defult http procotol version.
     DEFAULT_HTTP_VERSION = "HTTP/1.1"
+    
+    DEFAULT_HTTP_SCHEME = "http"
 
     def handle_one_request(self):
         try:
@@ -60,20 +64,19 @@ class BaseRequestHandler(BaseHTTPRequestHandler, object):
             self.close_connection = True
             return
 
-
     def run_wsgi(self):
         """
         request_head = self.request.recv(1024).strip()
         print "- -" * 20
         print request_head
-        print "- "* 20
+        print "- -"* 20
         """
-
+        self.set_environ()
         self.send_response()
         self.send_headers("Content-Type", "text/html; charset=utf-8")
         self.end_headers()
 
-        # router appliccation
+        # run application
         app = self.server.get_app()
         app()
 
@@ -81,7 +84,27 @@ class BaseRequestHandler(BaseHTTPRequestHandler, object):
         self.finish()
 
     def set_environ(self):
-        pass
+        """parse A URL.
+        e.g. <scheme>://<netloc>/<path>;<params>?<query>#<fragment>
+        """
+        scheme, netloc, path, params, query, fragment = \
+            urlparse.urlparse("http://example.com%s" % self.path)
+        scheme = scheme or self.DEFAULT_HTTP_SCHEME or "http"
+        
+        self.env = {
+            "wsgi.url_scheme":      scheme,
+            "wsgi.input":           self.rfile,
+            "wsgi.errors":          sys.stderr,
+            "REQUEST_METHOD":       self.command,
+            "PATH_INFO":            self.path,
+            "QUERY_STRING":         query,  
+            "CONTENT_TYPE":         self.headers.get("Content-Type", ""),
+            "CONTENT_LENGTH":       self.headers.get("Content-Length", ""),
+            "CLIENT_ADDR":          self.client_address[0],
+            "CLIENT_PORT":          self.client_address[1],
+            "SERVER_ADDR":          self.server.server_address[0],
+            "SERVER_PORT":          self.server.server_address[1]
+        }
 
     def handle(self):
         rv = super(BaseRequestHandler, self).handle()
