@@ -58,19 +58,17 @@ class BaseRequestHandler(BaseHTTPRequestHandler, object):
             if not self.raw_requestline:
                 self.close_connection = True
             elif self.parse_request():
-                return self.run_wsgi();
+                return self.run_wsgi()
         except socket.timeout as e:
             self.log_error("Request Time Out {0}".format(e))
             self.close_connection = True
             return
 
     def run_wsgi(self):
-        """
-        request_head = self.request.recv(1024).strip()
-        print "- -" * 20
-        print request_head
-        print "- -"* 20
-        """
+        print self.request.recv(1024)
+        print self.path
+        print self.raw_requestline
+        print "--------------"
         self.set_environ()
         self.send_response()
         self.send_headers("Content-Type", "text/html; charset=utf-8")
@@ -132,7 +130,6 @@ class BaseRequestHandler(BaseHTTPRequestHandler, object):
     def end_headers(self):
         # see HTTP Protocol RFC2616, ended with a space line.
         self.wfile.write("\r\n")
-
 
     def date_header(self, timestamp=None):
         if not timestamp:
