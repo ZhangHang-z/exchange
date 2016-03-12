@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+    excchange.app
+    ---------------
+"""
+
 import os
 from smts.util import isWindows
 
