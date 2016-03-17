@@ -15,7 +15,7 @@ import smts
 import urlparse
 
 from warnings import filterwarnings, catch_warnings
-import path
+
 with catch_warnings():
     if sys.py3kwarning:
         filterwarnings("ignore", "*mimetools has been removed",

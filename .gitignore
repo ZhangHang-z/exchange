@@ -2,7 +2,7 @@
 .idea
 .settings
 
-
-*.[\w*]project
+*.project
+*.pydevproject
 *.pyc
 test/node_modules

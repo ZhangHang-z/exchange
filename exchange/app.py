@@ -16,3 +16,5 @@ class Exchange(object):
     def __init__(self, static_dir=None):
         self.static_dir = static_dir if static_dir else self.DEFAULT_STATIC_DIR
         
+        
+        
