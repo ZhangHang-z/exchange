@@ -9,6 +9,14 @@ from smts.util import isWindows
 
 from serving import WSGIServer
 
+"""
+    exchange.app
+"""
+
+from router import Router
+
+
+
 def getDefaultStaticDir():
     if isWindows():
         return os.path.expanduser("~")
@@ -22,6 +30,7 @@ DEFAULT_STATIC_DIR = getDefaultStaticDir()
 class Exchange(object):
     def __init__(self, static_dir=None):
         self.static_dir = static_dir if static_dir else DEFAULT_STATIC_DIR
+        self.Router = 
     
     def run(self, host=None, port=None):
         if host is None:
