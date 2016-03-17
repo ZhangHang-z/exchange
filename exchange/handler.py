@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-    maybeHot.serve
+    exchange.handler
     ---------------
- 
-    There has a straightly way to extends Core Library Class,
-    which is BaseHTTPServer.BaseHTTPRequestHanler.
-    But I think it's even so lowly.
 """
 
 import socket
@@ -18,7 +14,7 @@ from warnings import filterwarnings, catch_warnings
 
 with catch_warnings():
     if sys.py3kwarning:
-        filterwarnings("ignore", "*mimetools has been removed",
+        filterwarnings('ignore', "*mimetools has been removed",
                     DeprecationWarning)
         import mimetools
 
@@ -32,25 +28,13 @@ except ImportError:
     import socketserver as SocketServer
 
 
-DEFAULT_ERROR_MESSAGE = """
-<html>
-<title>Error Occured</title>
-<body>
-<h1>Error</h1>
-<p>Error Code: {0}</p>
-<p>Message: {1}</p>
-</body>
-</html>
-"""
-
-
 class BaseRequestHandler(BaseHTTPRequestHandler, object):
-    _VERSION = "exchange/0.1"
+    _VERSION = 'exchange/0.1'
 
-    # defult http procotol version.
-    DEFAULT_HTTP_VERSION = "HTTP/1.1"
+    # default HTTP Protocol version.
+    DEFAULT_HTTP_VERSION = 'HTTP/1.1'
     
-    DEFAULT_HTTP_SCHEME = "http"
+    DEFAULT_HTTP_SCHEME = 'http'
 
     def handle_one_request(self):
         try:
@@ -58,22 +42,37 @@ class BaseRequestHandler(BaseHTTPRequestHandler, object):
             if not self.raw_requestline:
                 self.close_connection = True
             elif self.parse_request():
-                return self.run_wsgi();
+                return self.run_wsgi()
         except socket.timeout as e:
             self.log_error("Request Time Out {0}".format(e))
             self.close_connection = True
             return
-
+    
+    def parse_body(self, rdata):
+        """parse a Form Data string like: 
+            `user=name&password=passport`.
+        return a dictionary like:
+             `{ 'user': 'name', 'password': 'passport' }`.
+        """
+        field_lists = rdata.split('&')
+        body = {}
+        for field in field_lists:
+            k, v = field.split('=')
+            body[k] = v
+        return body
+        
     def run_wsgi(self):
-        """
-        request_head = self.request.recv(1024).strip()
-        print "- -" * 20
-        print request_head
-        print "- -"* 20
-        """
+        if self.command.upper() == 'POST':
+            raw_post_data = self.rfile.read(int(self.headers.get('content-length', '')))
+            self.body = self.parse_body(raw_post_data)
+        
+        print self.headers.get('Content-length', '')
+        print self.path
+        print self.raw_requestline
+        print "--------------"
         self.set_environ()
         self.send_response()
-        self.send_headers("Content-Type", "text/html; charset=utf-8")
+        self.send_headers('Content-Type', 'text/html; charset=utf-8')
         self.end_headers()
 
         # run application
@@ -89,7 +88,7 @@ class BaseRequestHandler(BaseHTTPRequestHandler, object):
         """
         scheme, netloc, path, params, query, fragment = \
             urlparse.urlparse("http://example.com%s" % self.path)
-        scheme = scheme or self.DEFAULT_HTTP_SCHEME or "http"
+        scheme = scheme or self.DEFAULT_HTTP_SCHEME or 'http'
         
         self.env = {
             "wsgi.url_scheme":      scheme,
@@ -98,8 +97,8 @@ class BaseRequestHandler(BaseHTTPRequestHandler, object):
             "REQUEST_METHOD":       self.command,
             "PATH_INFO":            self.path,
             "QUERY_STRING":         query,  
-            "CONTENT_TYPE":         self.headers.get("Content-Type", ""),
-            "CONTENT_LENGTH":       self.headers.get("Content-Length", ""),
+            "CONTENT_TYPE":         self.headers.get('Content-Type', ''),
+            "CONTENT_LENGTH":       self.headers.get('Content-Length', ''),
             "CLIENT_ADDR":          self.client_address[0],
             "CLIENT_PORT":          self.client_address[1],
             "SERVER_ADDR":          self.server.server_address[0],
@@ -118,10 +117,6 @@ class BaseRequestHandler(BaseHTTPRequestHandler, object):
             html_source_codes = "<code>No provided html</code>"
         self.request.sendall(html_source_codes)
 
-    def format_req_head(self):
-        request_head = self.request.recv(1024).strip()
-        return request_head.rstrip('\n')
-
     def send_response(self):
         self.wfile.write("{0} {1} {2}\r\n".format("HTTP/1.1", 200, "OK"))
         self.wfile.write("{0}: {1}\r\n".format("Date", self.date_header()))
@@ -131,8 +126,7 @@ class BaseRequestHandler(BaseHTTPRequestHandler, object):
 
     def end_headers(self):
         # see HTTP Protocol RFC2616, ended with a space line.
-        self.wfile.write("\r\n")
-
+        self.wfile.write('\r\n')
 
     def date_header(self, timestamp=None):
         if not timestamp:

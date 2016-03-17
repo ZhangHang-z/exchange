@@ -1,25 +1,25 @@
-from exchange import make_app, Exchange
+from exchange import Exchange
 
 if __name__ == '__main__':
-    make_app()
+    app = Exchange()
+    app.run("127.0.0.1", 8888)
     
  
    
 """
 app = Exchange()
 
-get_router = {
-    ("/user", userRouter),
-    ("/home", homePouter)
-}
+router = app.Router()
 
-post_router = {
-    ("/login", loginRouter),
-    ("/Submit", submitRouter)
-}
+router.post("/login", loginRouter)
+router.get("/Submit", submitRouter)
+app.use(router)
 
 app.staticDir(__name__)
+
 app.use(CSRFMiddle, "middleware")
-app.use(get_router, "GET")
-app.use(post_router, "POST")
+
+
+app.run("127.0.0.1", 8888)
+
 """

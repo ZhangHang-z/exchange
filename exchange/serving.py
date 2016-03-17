@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+    exchange.serving
+    ---------------
+"""
+
 from exchange import handler as H
 import socket
 
@@ -29,16 +34,4 @@ class WSGIServer(TCPServer, object):
 		return self.appliation
 
 
-def make_app(host=None, port=None):
-	if host is None:
-		host = "127.0.0.1"
-	if port is None:
-		port = 8888
-
-	print "Serveing on host: {0} \r\nport: {1} \r\n".format(host, port)
-	def app():
-		print "app function ......"
-
-	server = WSGIServer(host, port, app)
-	server.serve_forever()
 
